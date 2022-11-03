@@ -37,6 +37,15 @@ get_popular_artist = """
     LIMIT 1;
 """
 
+get_popular_tracks = """
+    SELECT tracks.id_track, artist_name, track_name, COUNT(*) as counted_plays
+    FROM tracks 
+    INNER JOIN plays ON tracks.id_track=plays.id_track
+    GROUP BY tracks.id_track
+    ORDER BY counted_plays DESC
+    LIMIT 5;
+"""
+
 
 def save_to_db(db, tracks, plays, amount_of_plays):
     with connect(db) as db_connector:
