@@ -28,6 +28,15 @@ create_plays_table = """
 insert_track = 'INSERT INTO tracks(id_track, artist_name, track_name) VALUES(?,?,?)'
 insert_play = 'INSERT INTO plays(id_user, id_track, date) VALUES(?,?,?)'
 
+get_popular_artist = """
+    SELECT artist_name, COUNT(*) as counted_plays
+    FROM tracks 
+    INNER JOIN plays ON tracks.id_track=plays.id_track
+    GROUP BY artist_name
+    ORDER BY counted_plays DESC
+    LIMIT 1;
+"""
+
 
 def save_to_db(db, tracks, plays, amount_of_plays):
     with connect(db) as db_connector:
