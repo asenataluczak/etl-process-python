@@ -61,6 +61,7 @@ def save_to_db(db, tracks, plays, amount_of_plays):
             track.pop(0)
             tracks_db.append(track)
         db_cursor.executemany(insert_track, tracks_db)
+        db_connector.commit()
         tracks_file.close()
 
         # Insert plays into db
@@ -72,6 +73,7 @@ def save_to_db(db, tracks, plays, amount_of_plays):
             plays[i] = plays[i].strip().split('<SEP>')
             plays_db.append(plays[i])
         db_cursor.executemany(insert_play, plays_db)
+        db_connector.commit()
         plays_file.close()
     return
 
