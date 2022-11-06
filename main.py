@@ -1,8 +1,22 @@
 from argparse import ArgumentParser
+from functools import wraps
 from sqlite3 import connect
+import time
 
 # how to run:
 # python main.py --db='test.sql' --tracks='unique_tracks.txt' --plays='triplets_sample_20p.txt' --amount_of_plays=100
+
+def timeit(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        end = time.perf_counter()
+        total = end - start
+        print(f"""
+            [Czas przetwarzania danych: {total:.4f} sekund]""")
+        return result
+    return wrapper
 
 create_tracks_table = """
     CREATE TABLE IF NOT EXISTS tracks(
@@ -30,7 +44,7 @@ insert_play = 'INSERT INTO plays(id_user, id_track, date) VALUES(?,?,?)'
 
 select_popular_artist = """
     SELECT artist_name, COUNT(*) as counted_plays
-    FROM tracks 
+    FROM tracks
     INNER JOIN plays ON tracks.id_track=plays.id_track
     GROUP BY artist_name
     ORDER BY counted_plays DESC
@@ -39,14 +53,14 @@ select_popular_artist = """
 
 select_popular_tracks = """
     SELECT tracks.id_track, artist_name, track_name, COUNT(*) as counted_plays
-    FROM tracks 
+    FROM tracks
     INNER JOIN plays ON tracks.id_track=plays.id_track
     GROUP BY tracks.id_track
     ORDER BY counted_plays DESC
     LIMIT 5;
 """
 
-
+@timeit
 def save_to_db(db, tracks, plays, amount_of_plays):
     with connect(db) as db_connector:
         db_connector.execute(create_tracks_table)
@@ -82,9 +96,9 @@ def save_to_db(db, tracks, plays, amount_of_plays):
         res_tracks = db_cursor.execute(select_popular_tracks)
         result = f"""
             ============= NAJPOPULARNIEJSZY ARTYSTA =============
-            1. {artist_name}                                         
-            liczba odsluchan: {artist_plays}                  
-                                                                   
+            1. {artist_name}
+            liczba odsluchan: {artist_plays}
+
             ============= NAJPOPULARNIEJSZE UTWORY =============="""
 
         print(result)
