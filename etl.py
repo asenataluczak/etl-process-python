@@ -10,13 +10,14 @@ def extract(file):
     return rows
 
 
-def transform(file, limit = 0):
+def transform(file, limit = None):
     data_db = []
     rows = extract(file)
     length = limit or len(rows)
     for i in range(length):
         rows[i] = rows[i].strip().split('<SEP>')
-        if (bool(limit) == False):
+        # W przypadku pliku 'tracks' nie wykorzystuję 'identyfikatora wykonania', więc usuwam tę kolumnę
+        if (limit == None):
             rows[i].pop(0)
         data_db.append(rows[i])
     return data_db
