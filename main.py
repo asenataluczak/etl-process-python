@@ -28,7 +28,7 @@ create_plays_table = """
 insert_track = 'INSERT INTO tracks(id_track, artist_name, track_name) VALUES(?,?,?)'
 insert_play = 'INSERT INTO plays(id_user, id_track, date) VALUES(?,?,?)'
 
-get_popular_artist = """
+select_popular_artist = """
     SELECT artist_name, COUNT(*) as counted_plays
     FROM tracks 
     INNER JOIN plays ON tracks.id_track=plays.id_track
@@ -37,7 +37,7 @@ get_popular_artist = """
     LIMIT 1;
 """
 
-get_popular_tracks = """
+select_popular_tracks = """
     SELECT tracks.id_track, artist_name, track_name, COUNT(*) as counted_plays
     FROM tracks 
     INNER JOIN plays ON tracks.id_track=plays.id_track
@@ -75,6 +75,23 @@ def save_to_db(db, tracks, plays, amount_of_plays):
         db_cursor.executemany(insert_play, plays_db)
         db_connector.commit()
         plays_file.close()
+
+        # Get and display results
+        res_artist = db_cursor.execute(select_popular_artist)
+        artist_name, artist_plays = res_artist.fetchone()
+        res_tracks = db_cursor.execute(select_popular_tracks)
+        result = f"""
+            ============= NAJPOPULARNIEJSZY ARTYSTA =============
+            1. {artist_name}                                         
+            liczba odsluchan: {artist_plays}                  
+                                                                   
+            ============= NAJPOPULARNIEJSZE UTWORY =============="""
+
+        print(result)
+        for i, track in enumerate(res_tracks.fetchall()):
+            print(f"""
+            {i+1}. {track[2]} ({track[1]})
+            liczba odsluchan: {track[3]}""")
     return
 
 
@@ -87,7 +104,7 @@ def main():
     args = parser.parse_args()
 
     save_to_db(args.db, args.tracks, args.plays, args.amount_of_plays)
-    input()
+    input("\n...")
 
 
 if __name__ == '__main__':
