@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 from functools import wraps
 from sqlite3 import connect
+import sql_queries
 import time
 
 # how to run:
@@ -18,53 +19,12 @@ def timeit(func):
         return result
     return wrapper
 
-create_tracks_table = """
-    CREATE TABLE IF NOT EXISTS tracks(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        id_track VARCHAR(50),
-        artist_name VARCHAR(50),
-        track_name VARCHAR(50)
-    );
-"""
-
-create_plays_table = """
-    CREATE TABLE IF NOT EXISTS plays(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        id_user VARCHAR(50),
-        id_track VARCHAR(50),
-        date VARCHAR(50),
-        CONSTRAINT fk_tracks
-            FOREIGN KEY (id_track)
-            REFERENCES tracks(id_track)
-    )
-"""
-
-insert_track = 'INSERT INTO tracks(id_track, artist_name, track_name) VALUES(?,?,?)'
-insert_play = 'INSERT INTO plays(id_user, id_track, date) VALUES(?,?,?)'
-
-select_popular_artist = """
-    SELECT artist_name, COUNT(*) as counted_plays
-    FROM tracks
-    INNER JOIN plays ON tracks.id_track=plays.id_track
-    GROUP BY artist_name
-    ORDER BY counted_plays DESC
-    LIMIT 1;
-"""
-
-select_popular_tracks = """
-    SELECT tracks.id_track, artist_name, track_name, COUNT(*) as counted_plays
-    FROM tracks
-    INNER JOIN plays ON tracks.id_track=plays.id_track
-    GROUP BY tracks.id_track
-    ORDER BY counted_plays DESC
-    LIMIT 5;
-"""
 
 @timeit
 def save_to_db(db, tracks, plays, amount_of_plays):
     with connect(db) as db_connector:
-        db_connector.execute(create_tracks_table)
-        db_connector.execute(create_plays_table)
+        db_connector.execute(sql_queries.create_tracks_table)
+        db_connector.execute(sql_queries.create_plays_table)
         db_cursor = db_connector.cursor()
 
         # Insert tracks into db
@@ -74,7 +34,7 @@ def save_to_db(db, tracks, plays, amount_of_plays):
             track = track.strip().split('<SEP>')
             track.pop(0)
             tracks_db.append(track)
-        db_cursor.executemany(insert_track, tracks_db)
+        db_cursor.executemany(sql_queries.insert_track, tracks_db)
         db_connector.commit()
         tracks_file.close()
 
@@ -86,14 +46,14 @@ def save_to_db(db, tracks, plays, amount_of_plays):
         for i in range(plays_length):
             plays[i] = plays[i].strip().split('<SEP>')
             plays_db.append(plays[i])
-        db_cursor.executemany(insert_play, plays_db)
+        db_cursor.executemany(sql_queries.insert_play, plays_db)
         db_connector.commit()
         plays_file.close()
 
         # Get and display results
-        res_artist = db_cursor.execute(select_popular_artist)
+        res_artist = db_cursor.execute(sql_queries.select_popular_artist)
         artist_name, artist_plays = res_artist.fetchone()
-        res_tracks = db_cursor.execute(select_popular_tracks)
+        res_tracks = db_cursor.execute(sql_queries.select_popular_tracks)
         result = f"""
             ============= NAJPOPULARNIEJSZY ARTYSTA =============
             1. {artist_name}
