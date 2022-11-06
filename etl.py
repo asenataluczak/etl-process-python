@@ -1,20 +1,6 @@
-from functools import wraps
 from sqlite3 import connect
+from utils import timeit
 import sql_queries
-import time
-
-
-def timeit(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        start = time.perf_counter()
-        result = func(*args, **kwargs)
-        end = time.perf_counter()
-        total = end - start
-        print(f"""
-            [Czas przetwarzania danych: {total:.4f} sekund]""")
-        return result
-    return wrapper
 
 
 def extract(file):
