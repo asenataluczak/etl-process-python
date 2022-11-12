@@ -30,6 +30,8 @@ def etl(db, tracks, plays, amount_of_plays):
 
     with connect(db) as db_connector:
         # Load data 
+        db_connector.execute("DROP TABLE IF EXISTS tracks")
+        db_connector.execute("DROP TABLE IF EXISTS plays")
         db_connector.execute(sql_queries.create_tracks_table)
         db_connector.execute(sql_queries.create_plays_table)
         db_cursor = db_connector.cursor()
