@@ -23,9 +23,9 @@ insert_track = 'INSERT OR IGNORE INTO tracks(id_track, artist_name, track_name) 
 insert_play = 'INSERT INTO plays(id_user, id_track, date) VALUES(?,?,?)'
 
 select_popular_artist = """
-    SELECT artist_name, COUNT(*) as counted_plays
-    FROM tracks
-    INNER JOIN plays ON tracks.id_track=plays.id_track
+    SELECT tracks.artist_name, COUNT(*) as counted_plays
+    FROM plays
+    LEFT JOIN tracks ON plays.id_track=tracks.id_track
     GROUP BY artist_name
     ORDER BY counted_plays DESC
     LIMIT 1;
