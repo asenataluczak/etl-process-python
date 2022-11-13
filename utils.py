@@ -12,3 +12,11 @@ def timeit(func):
             [Czas przetwarzania danych: {total:.4f} sekund]""")
         return result
     return wrapper
+
+def loading_animation(loading):
+    animation = "|/-\\"
+    index = 0
+    while loading:
+        print(animation[index % len(animation)], end="\r")
+        index += 1
+        time.sleep(0.1)

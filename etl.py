@@ -1,5 +1,5 @@
 from sqlite3 import connect
-from utils import timeit
+from utils import loading_animation, timeit
 import sql_queries
 
 
@@ -25,6 +25,7 @@ def transform(file, limit = None):
 
 @timeit
 def etl(db, tracks, plays, amount_of_plays):
+    loading_animation(True)
     transformed_tracks = transform(tracks)
     transformed_plays = transform(plays, amount_of_plays)
 
@@ -57,4 +58,6 @@ def etl(db, tracks, plays, amount_of_plays):
             print(f"""
             {i+1}. {track[2]} ({track[1]})
             liczba odsluchan: {track[3]}""")
+        
+    loading_animation(False)
     return
