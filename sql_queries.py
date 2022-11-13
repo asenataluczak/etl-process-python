@@ -1,7 +1,7 @@
 create_tracks_table = """
     CREATE TABLE IF NOT EXISTS tracks(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        id_track VARCHAR(50),
+        id_track VARCHAR(50) UNIQUE,
         artist_name VARCHAR(50),
         track_name VARCHAR(50)
     );
@@ -19,7 +19,7 @@ create_plays_table = """
     )
 """
 
-insert_track = 'INSERT INTO tracks(id_track, artist_name, track_name) VALUES(?,?,?)'
+insert_track = 'INSERT OR IGNORE INTO tracks(id_track, artist_name, track_name) VALUES(?,?,?)'
 insert_play = 'INSERT INTO plays(id_user, id_track, date) VALUES(?,?,?)'
 
 select_popular_artist = """
