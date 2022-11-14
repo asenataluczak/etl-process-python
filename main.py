@@ -4,6 +4,7 @@ from etl import etl
 # how to run:
 # python main.py --db='test.sql' --tracks='unique_tracks.txt' --plays='triplets_sample_20p.txt' --amount_of_plays=100
 
+
 def main():
     parser = ArgumentParser()
     parser.add_argument('--db', type=str, required=True)
