@@ -25,7 +25,7 @@ def transform(file, limit=None):
 @timeit
 def etl(db, tracks, plays, amount_of_plays):
     transformed_tracks = transform(tracks)
-    transformed_plays = transform(plays, amount_of_plays)
+    transformed_plays = transform(plays, amount_of_plays or 0)
 
     with connect(db) as db_connector:
         # Load data 
