@@ -11,15 +11,13 @@ def extract(file):
 
 
 def transform(file, limit=None):
-    data_db = []
     rows = extract(file)
     length = limit or len(rows)
     for i in range(length):
         rows[i] = rows[i].strip().split('<SEP>')
         if limit is None:
             rows[i].pop(0)
-        data_db.append(rows[i])
-    return data_db
+        yield rows[i]
 
 
 @timeit
