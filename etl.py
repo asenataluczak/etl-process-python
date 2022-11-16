@@ -27,13 +27,15 @@ def etl(db, tracks, plays, amount_of_plays):
     print('... saving data to db ...')
 
     with connect(db) as db_connector:
-        # Load data 
         db_connector.execute("DROP TABLE IF EXISTS tracks")
         db_connector.execute("DROP TABLE IF EXISTS plays")
+        db_connector.execute("DROP VIEW IF EXISTS plays_view")
+        db_connector.execute("DROP VIEW IF EXISTS limited_plays_view")
+
+        # Load data 
         db_connector.execute(sql_queries.create_tracks_table)
         db_connector.execute(sql_queries.create_plays_table)
         db_cursor = db_connector.cursor()
-
         db_cursor.executemany(sql_queries.insert_track, transformed_tracks)
         db_connector.commit()
         db_cursor.executemany(sql_queries.insert_play, transformed_plays)
@@ -41,6 +43,8 @@ def etl(db, tracks, plays, amount_of_plays):
         
         # Get and display results
         print('... selecting results ...\n')
+        db_connector.execute(sql_queries.helper_view)
+        db_connector.execute(sql_queries.limited_helper_view)
         res_artist = db_cursor.execute(sql_queries.select_popular_artist)
         artist_name, artist_plays = res_artist.fetchone()
         res_tracks = db_cursor.execute(sql_queries.select_popular_tracks)
@@ -54,7 +58,7 @@ def etl(db, tracks, plays, amount_of_plays):
         print(result)
         for i, track in enumerate(res_tracks.fetchall()):
             print(f"""
-            {i+1}. {track[2]} ({track[1]})
-            liczba odsluchan: {track[3]}""")
+            {i+1}. {track[0]} ({track[1]})
+            liczba odsluchan: {track[2]}""")
         
     return

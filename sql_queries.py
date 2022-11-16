@@ -22,20 +22,31 @@ create_plays_table = """
 insert_track = 'INSERT OR IGNORE INTO tracks(id_track, artist_name, track_name) VALUES(?,?,?)'
 insert_play = 'INSERT INTO plays(id_user, id_track, date) VALUES(?,?,?)'
 
-select_popular_artist = """
-    SELECT tracks.artist_name, COUNT(*) as counted_plays
-    FROM plays
-    LEFT JOIN tracks ON plays.id_track=tracks.id_track
-    GROUP BY artist_name
-    ORDER BY counted_plays DESC
-    LIMIT 1;
+helper_view = """
+    CREATE VIEW plays_view 
+    AS SELECT id_track, COUNT(id_track) AS 'counted_plays' 
+    FROM plays 
+    GROUP BY id_track 
+    ORDER BY COUNT(id_track) DESC;
+"""
+
+limited_helper_view = """
+    CREATE VIEW limited_plays_view 
+    AS SELECT * FROM plays_view 
+    LIMIT 5;
 """
 
 select_popular_tracks = """
-    SELECT tracks.id_track, artist_name, track_name, COUNT(*) as counted_plays
-    FROM tracks
-    INNER JOIN plays ON tracks.id_track=plays.id_track
-    GROUP BY tracks.id_track
-    ORDER BY counted_plays DESC
-    LIMIT 5;
+    SELECT tracks.track_name, tracks.artist_name, limited_plays_view.counted_plays 
+    FROM limited_plays_view 
+    LEFT JOIN tracks ON tracks.id_track=limited_plays_view.id_track;
+"""
+
+select_popular_artist = """
+    SELECT tracks.artist_name, SUM(plays_view.counted_plays)
+    FROM plays_view 
+    LEFT JOIN tracks ON tracks.id_track=plays_view.id_track 
+    GROUP BY tracks.artist_name 
+    ORDER BY SUM(plays_view.counted_plays) DESC
+    LIMIT 1;
 """
