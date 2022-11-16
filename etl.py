@@ -24,6 +24,7 @@ def transform(file, limit=None):
 def etl(db, tracks, plays, amount_of_plays):
     transformed_tracks = transform(tracks)
     transformed_plays = transform(plays, amount_of_plays or 0)
+    print('... saving data to db ...')
 
     with connect(db) as db_connector:
         # Load data 
@@ -39,6 +40,7 @@ def etl(db, tracks, plays, amount_of_plays):
         db_connector.commit()
         
         # Get and display results
+        print('... selecting results ...\n')
         res_artist = db_cursor.execute(sql_queries.select_popular_artist)
         artist_name, artist_plays = res_artist.fetchone()
         res_tracks = db_cursor.execute(sql_queries.select_popular_tracks)
