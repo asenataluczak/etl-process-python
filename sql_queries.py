@@ -1,8 +1,8 @@
 create_tracks_table = """
     CREATE TABLE IF NOT EXISTS tracks(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        id_track VARCHAR(50) UNIQUE,
-        artist_name VARCHAR(50),
+        id_track VARCHAR(20) UNIQUE,
+        artist_name VARCHAR(40),
         track_name VARCHAR(50)
     );
 """
@@ -10,9 +10,9 @@ create_tracks_table = """
 create_plays_table = """
     CREATE TABLE IF NOT EXISTS plays(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        id_user VARCHAR(50),
-        id_track VARCHAR(50),
-        date VARCHAR(50),
+        id_user VARCHAR(40),
+        id_track VARCHAR(20),
+        date VARCHAR(15),
         CONSTRAINT fk_tracks
             FOREIGN KEY (id_track)
             REFERENCES tracks(id_track)
